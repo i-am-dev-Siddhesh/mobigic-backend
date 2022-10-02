@@ -87,14 +87,16 @@ exports.userUpdateSchema = joi_1.default.object().keys({
     }),
 });
 exports.validateFileDownload = joi_1.default.object().keys({
-    filename: joi_1.default.string().messages({
+    filename: joi_1.default.string().required().messages({
         "string.base": `File Name should be a type of string`,
         "string.empty": `File Name cannot be an empty field`,
+        "any.required": `File Name is a required field`,
         "string.max": `File Name can have a maximum length of {#limit}`,
     }),
     code: joi_1.default.number().messages({
         "number.base": `Code should be a type of number`,
         "number.empty": `Code cannot be an empty field`,
+        "any.required": `File Name is a required field`,
         "number.max": `Code can have a maximum length of {#limit}`,
     }),
 });

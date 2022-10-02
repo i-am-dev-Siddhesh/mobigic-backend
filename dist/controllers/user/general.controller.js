@@ -222,8 +222,7 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 message: "File not found",
             };
         }
-        const ext = req.file.mimetype.split("/")[1];
-        const filePath = `user-${req.file.fieldname}-${Date.now()}.${ext}`;
+        const filePath = req.file.filename;
         const code = Math.floor(100000 + Math.random() * 900000);
         const user = req.user;
         yield prisma_1.prisma.files.create({
@@ -236,6 +235,8 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         return res.status(200).json({
             status: true,
             message: `File uploaded successfully`,
+            file: filePath,
+            code: code,
         });
     }
     catch (error) {
@@ -263,7 +264,7 @@ const getUploadedFile = (req, res) => __awaiter(void 0, void 0, void 0, function
         });
         if (!file) {
             throw {
-                message: "File not found",
+                message: "Invalid code or file.",
                 statusCode: 404,
             };
         }

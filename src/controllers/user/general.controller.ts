@@ -223,9 +223,7 @@ export const uploadFile = async (req: Request, res: Response) => {
         message: "File not found",
       };
     }
-
-    const ext = req.file.mimetype.split("/")[1];
-    const filePath = `user-${req.file.fieldname}-${Date.now()}.${ext}`;
+    const filePath = req.file.filename;
     const code = Math.floor(100000 + Math.random() * 900000);
     const user = req.user;
 
@@ -240,6 +238,8 @@ export const uploadFile = async (req: Request, res: Response) => {
     return res.status(200).json({
       status: true,
       message: `File uploaded successfully`,
+      file: filePath,
+      code: code,
     });
   } catch (error: any) {
     let statusCode = 500;
@@ -268,7 +268,7 @@ export const getUploadedFile = async (req: Request, res: Response) => {
 
     if (!file) {
       throw {
-        message: "File not found",
+        message: "Invalid code or file.",
         statusCode: 404,
       };
     }

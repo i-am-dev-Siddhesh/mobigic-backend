@@ -110,14 +110,16 @@ export const userUpdateSchema = Joi.object().keys({
     }),
 });
 export const validateFileDownload = Joi.object().keys({
-  filename: Joi.string().messages({
+  filename: Joi.string().required().messages({
     "string.base": `File Name should be a type of string`,
     "string.empty": `File Name cannot be an empty field`,
+    "any.required": `File Name is a required field`,
     "string.max": `File Name can have a maximum length of {#limit}`,
   }),
   code: Joi.number().messages({
     "number.base": `Code should be a type of number`,
     "number.empty": `Code cannot be an empty field`,
+    "any.required": `File Name is a required field`,
     "number.max": `Code can have a maximum length of {#limit}`,
   }),
 });
