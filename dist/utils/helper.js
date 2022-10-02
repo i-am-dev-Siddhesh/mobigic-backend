@@ -44,6 +44,6 @@ exports.multerStorage = multer_1.default.diskStorage({
     },
     filename: (req, file, cb) => {
         const ext = file.mimetype.split("/")[1];
-        cb(null, `files/user-${file.fieldname}-${Date.now()}.${ext}`);
+        cb(null, `user-${file.fieldname}-${Date.now()}.${ext}`);
     },
 });

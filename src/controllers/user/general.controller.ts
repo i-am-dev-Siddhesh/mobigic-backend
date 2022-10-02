@@ -214,7 +214,7 @@ export const resetPasswordApi = async (req: Request, res: Response) => {
 };
 
 // @desc    Upload File
-// @route   PUT /v1/user/file
+// @route   POST /v1/user/file
 // @access  protected
 export const uploadFile = async (req: Request, res: Response) => {
   try {
@@ -241,6 +241,39 @@ export const uploadFile = async (req: Request, res: Response) => {
       status: true,
       message: `File uploaded successfully`,
     });
+  } catch (error: any) {
+    let statusCode = 500;
+    if (error.statusCode) {
+      statusCode = error.statusCode;
+    }
+    return res.status(statusCode).json(generalError(error));
+  }
+};
+
+// @desc    Download File
+// @route   POST /v1/user/file/download
+// @access  protected
+export const getUploadedFile = async (req: Request, res: Response) => {
+  try {
+    const fileName = req.body.filename;
+    const code = req.body.code;
+
+    const file = await prisma.files.findFirst({
+      where: {
+        fileUrl: fileName,
+        ownerId: req.user.id,
+        code: code,
+      },
+    });
+
+    if (!file) {
+      throw {
+        message: "File not found",
+        statusCode: 404,
+      };
+    }
+
+    return res.sendFile(fileName, { root: "public" });
   } catch (error: any) {
     let statusCode = 500;
     if (error.statusCode) {

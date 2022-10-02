@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userUpdateSchema = exports.userRegistrationSchema = exports.resetPasswordSchema = exports.forgotPasswordSchema = exports.getUserSchema = exports.loginSchema = void 0;
+exports.validateFileDownload = exports.userUpdateSchema = exports.userRegistrationSchema = exports.resetPasswordSchema = exports.forgotPasswordSchema = exports.getUserSchema = exports.loginSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 exports.loginSchema = joi_1.default.object().keys({
     email: joi_1.default.string().email().required(),
@@ -84,5 +84,17 @@ exports.userUpdateSchema = joi_1.default.object().keys({
     })
         .messages({
         "any.only": "Re-Entered password should be same as password",
+    }),
+});
+exports.validateFileDownload = joi_1.default.object().keys({
+    filename: joi_1.default.string().messages({
+        "string.base": `File Name should be a type of string`,
+        "string.empty": `File Name cannot be an empty field`,
+        "string.max": `File Name can have a maximum length of {#limit}`,
+    }),
+    code: joi_1.default.number().messages({
+        "number.base": `Code should be a type of number`,
+        "number.empty": `Code cannot be an empty field`,
+        "number.max": `Code can have a maximum length of {#limit}`,
     }),
 });

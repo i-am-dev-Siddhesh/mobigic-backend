@@ -79,7 +79,6 @@ export const userUpdateSchema = Joi.object().keys({
     "string.max": `Name can have a maximum length of {#limit}`,
   }),
 
-  
   email: Joi.string().email().max(100).messages({
     "string.base": `Email should be a type of string`,
     "string.max": `Email can have a maximum length of {#limit}`,
@@ -109,4 +108,16 @@ export const userUpdateSchema = Joi.object().keys({
     .messages({
       "any.only": "Re-Entered password should be same as password",
     }),
+});
+export const validateFileDownload = Joi.object().keys({
+  filename: Joi.string().messages({
+    "string.base": `File Name should be a type of string`,
+    "string.empty": `File Name cannot be an empty field`,
+    "string.max": `File Name can have a maximum length of {#limit}`,
+  }),
+  code: Joi.number().messages({
+    "number.base": `Code should be a type of number`,
+    "number.empty": `Code cannot be an empty field`,
+    "number.max": `Code can have a maximum length of {#limit}`,
+  }),
 });

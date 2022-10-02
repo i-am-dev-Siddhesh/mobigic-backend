@@ -31,8 +31,6 @@ export const checkToken = async (
   const token = req.session.sessionId;
 
   try {
-    console.log("token", token);
-
     const decoded = jwt.verify(token, process.env.JWT_TOKEN_SECRET!) as User;
 
     const user = await prisma.user.findUnique({

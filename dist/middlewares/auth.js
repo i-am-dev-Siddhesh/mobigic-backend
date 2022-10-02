@@ -34,7 +34,6 @@ const checkToken = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     // @ts-ignore
     const token = req.session.sessionId;
     try {
-        console.log("token", token);
         const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_TOKEN_SECRET);
         const user = yield prisma_1.prisma.user.findUnique({
             where: {

@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadFile = exports.resetPasswordApi = exports.forgotPasswordApi = exports.userUpdateApi = exports.userRegistrationApi = void 0;
+exports.getUploadedFile = exports.uploadFile = exports.resetPasswordApi = exports.forgotPasswordApi = exports.userUpdateApi = exports.userRegistrationApi = void 0;
 const argon2_1 = __importDefault(require("argon2"));
 const auth_1 = require("../../utils/auth");
 const errorResponse_1 = require("../../utils/errorResponse");
@@ -213,7 +213,7 @@ const resetPasswordApi = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.resetPasswordApi = resetPasswordApi;
 // @desc    Upload File
-// @route   PUT /v1/user/file
+// @route   POST /v1/user/file
 // @access  protected
 const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -247,3 +247,34 @@ const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.uploadFile = uploadFile;
+// @desc    Download File
+// @route   POST /v1/user/file/download
+// @access  protected
+const getUploadedFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const fileName = req.body.filename;
+        const code = req.body.code;
+        const file = yield prisma_1.prisma.files.findFirst({
+            where: {
+                fileUrl: fileName,
+                ownerId: req.user.id,
+                code: code,
+            },
+        });
+        if (!file) {
+            throw {
+                message: "File not found",
+                statusCode: 404,
+            };
+        }
+        return res.sendFile(fileName, { root: "public" });
+    }
+    catch (error) {
+        let statusCode = 500;
+        if (error.statusCode) {
+            statusCode = error.statusCode;
+        }
+        return res.status(statusCode).json((0, errorResponse_1.generalError)(error));
+    }
+});
+exports.getUploadedFile = getUploadedFile;

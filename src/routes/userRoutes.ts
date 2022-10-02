@@ -8,11 +8,13 @@ import {
   resetPasswordSchema,
   userRegistrationSchema,
   userUpdateSchema,
+  validateFileDownload,
 } from "../validations/auth";
 
 import { checkServerHealth } from "../controllers/general.controller";
 import {
   forgotPasswordApi,
+  getUploadedFile,
   resetPasswordApi,
   uploadFile,
   userRegistrationApi,
@@ -46,5 +48,14 @@ router
 router
   .route("/file")
   .post(checkApiKey, checkToken, upload.single("file"), uploadFile);
+  
+router
+  .route("/file/download")
+  .post(
+    checkApiKey,
+    checkToken,
+    validate(validateFileDownload),
+    getUploadedFile
+  );
 
 export default router;

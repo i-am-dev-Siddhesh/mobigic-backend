@@ -31,4 +31,7 @@ router
 router
     .route("/file")
     .post(auth_1.checkApiKey, auth_1.checkToken, upload.single("file"), general_controller_2.uploadFile);
+router
+    .route("/file/download")
+    .post(auth_1.checkApiKey, auth_1.checkToken, (0, validate_1.validate)(auth_2.validateFileDownload), general_controller_2.getUploadedFile);
 exports.default = router;
