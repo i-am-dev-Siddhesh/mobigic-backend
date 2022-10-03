@@ -23,8 +23,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUploadedFile = exports.uploadFile = exports.resetPasswordApi = exports.forgotPasswordApi = exports.userUpdateApi = exports.userRegistrationApi = void 0;
+exports.getFile = exports.getUploadedFile = exports.uploadFile = exports.resetPasswordApi = exports.forgotPasswordApi = exports.userUpdateApi = exports.userRegistrationApi = void 0;
 const argon2_1 = __importDefault(require("argon2"));
+const fs_1 = __importDefault(require("fs"));
+const mime_1 = __importDefault(require("mime"));
 const auth_1 = require("../../utils/auth");
 const errorResponse_1 = require("../../utils/errorResponse");
 const helper_1 = require("../../utils/helper");
@@ -252,15 +254,17 @@ exports.uploadFile = uploadFile;
 // @route   POST /v1/user/file/download
 // @access  protected
 const getUploadedFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         const fileName = req.body.filename;
         const code = req.body.code;
+        const data = {
+            fileUrl: fileName,
+            ownerId: (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a.id,
+            code: code,
+        };
         const file = yield prisma_1.prisma.files.findFirst({
-            where: {
-                fileUrl: fileName,
-                ownerId: req.user.id,
-                code: code,
-            },
+            where: data,
         });
         if (!file) {
             throw {
@@ -268,7 +272,13 @@ const getUploadedFile = (req, res) => __awaiter(void 0, void 0, void 0, function
                 statusCode: 404,
             };
         }
-        return res.sendFile(fileName, { root: "public" });
+        const filePath = "public/" + fileName;
+        const stream = fs_1.default.createReadStream(filePath);
+        // @ts-ignore
+        const type = mime_1.default.getType("public/" + fileName);
+        res.setHeader("Content-Type", type);
+        res.setHeader("Content-Disposition", `inline; filename=${fileName}`);
+        return stream.pipe(res);
     }
     catch (error) {
         let statusCode = 500;
@@ -279,3 +289,32 @@ const getUploadedFile = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getUploadedFile = getUploadedFile;
+// @desc    GET Files
+// @route   GET /v1/user/file
+// @access  protected
+const getFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = req.user;
+        const files = yield prisma_1.prisma.files.findMany({
+            where: {
+                ownerId: user.id,
+            },
+            select: {
+                fileUrl: true,
+                id: true,
+            },
+        });
+        return res.status(200).json({
+            status: true,
+            data: files,
+        });
+    }
+    catch (error) {
+        let statusCode = 500;
+        if (error.statusCode) {
+            statusCode = error.statusCode;
+        }
+        return res.status(statusCode).json((0, errorResponse_1.generalError)(error));
+    }
+});
+exports.getFile = getFile;

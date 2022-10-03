@@ -37,6 +37,9 @@ export const checkToken = async (
       where: {
         email: decoded?.email!,
       },
+      include: {
+        files: true,
+      },
     });
 
     if (!user) {

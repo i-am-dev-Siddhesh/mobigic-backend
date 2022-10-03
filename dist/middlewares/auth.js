@@ -39,6 +39,9 @@ const checkToken = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             where: {
                 email: decoded === null || decoded === void 0 ? void 0 : decoded.email,
             },
+            include: {
+                files: true,
+            },
         });
         if (!user) {
             throw {

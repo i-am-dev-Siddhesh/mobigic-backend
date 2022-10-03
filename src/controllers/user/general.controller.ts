@@ -1,5 +1,7 @@
 import argon2 from "argon2";
 import { Request, Response } from "express";
+import fs from "fs";
+import mime from "mime";
 import { createJWTToken, decodeJWTToken } from "../../utils/auth";
 import { generalError } from "../../utils/errorResponse";
 import { getValueInRedis, setValueInRedisWithExp } from "../../utils/helper";
@@ -257,13 +259,14 @@ export const getUploadedFile = async (req: Request, res: Response) => {
   try {
     const fileName = req.body.filename;
     const code = req.body.code;
+    const data = {
+      fileUrl: fileName,
+      ownerId: req?.user?.id,
+      code: code,
+    };
 
     const file = await prisma.files.findFirst({
-      where: {
-        fileUrl: fileName,
-        ownerId: req.user.id,
-        code: code,
-      },
+      where: data,
     });
 
     if (!file) {
@@ -273,7 +276,44 @@ export const getUploadedFile = async (req: Request, res: Response) => {
       };
     }
 
-    return res.sendFile(fileName, { root: "public" });
+    const filePath = "public/" + fileName;
+    const stream = fs.createReadStream(filePath);
+    // @ts-ignore
+    const type = mime.getType("public/" + fileName);
+    res.setHeader("Content-Type", type);
+    res.setHeader("Content-Disposition", `inline; filename=${fileName}`);
+
+    return stream.pipe(res);
+  } catch (error: any) {
+    let statusCode = 500;
+    if (error.statusCode) {
+      statusCode = error.statusCode;
+    }
+    return res.status(statusCode).json(generalError(error));
+  }
+};
+
+// @desc    GET Files
+// @route   GET /v1/user/file
+// @access  protected
+export const getFile = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+
+    const files = await prisma.files.findMany({
+      where: {
+        ownerId: user.id,
+      },
+      select: {
+        fileUrl: true,
+        id: true,
+      },
+    });
+
+    return res.status(200).json({
+      status: true,
+      data: files,
+    });
   } catch (error: any) {
     let statusCode = 500;
     if (error.statusCode) {

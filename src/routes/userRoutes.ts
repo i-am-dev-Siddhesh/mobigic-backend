@@ -14,6 +14,7 @@ import {
 import { checkServerHealth } from "../controllers/general.controller";
 import {
   forgotPasswordApi,
+  getFile,
   getUploadedFile,
   resetPasswordApi,
   uploadFile,
@@ -47,8 +48,9 @@ router
 
 router
   .route("/file")
+  .get(checkApiKey, checkToken, getFile)
   .post(checkApiKey, checkToken, upload.single("file"), uploadFile);
-  
+
 router
   .route("/file/download")
   .post(

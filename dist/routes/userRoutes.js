@@ -30,6 +30,7 @@ router
     .post(auth_1.checkApiKey, (0, validate_1.validate)(auth_2.userUpdateSchema), general_controller_2.userUpdateApi);
 router
     .route("/file")
+    .get(auth_1.checkApiKey, auth_1.checkToken, general_controller_2.getFile)
     .post(auth_1.checkApiKey, auth_1.checkToken, upload.single("file"), general_controller_2.uploadFile);
 router
     .route("/file/download")
