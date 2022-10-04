@@ -7,6 +7,7 @@
 ### Run npm install in root path of this repo
 
 ### Configure your local postgres database and add proper DATABASE_URL in env var
+### After configuring local database run command npx prisma db push
 
 ### Run command npm run dev for watch mode
 
